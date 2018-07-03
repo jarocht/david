@@ -3,7 +3,6 @@ var app = express();
 var gpio = require('./gpio.js');
 var timer = require('./timer.js');
 var patterns = require('./patterns.js');
-var sensor = require('./sensor.js');
 
 var port = 3000;
 var baseUrl = "/api";
@@ -94,13 +93,22 @@ app.get(baseUrl + '/manual/:pin/on', (req, res) => {
     res.send(result);
 });
 
+/*app.get(baseUrl + '/patterns/:name', (req, res) => {
+    var pattern = patterns[req.params.name];
+    if (pattern) {
+        timer.sequence(pattern);
+        res.send("SUCCESS");
+    } else {
+        res.status(404).send("NOT FOUND");
+    }
+});*/
+
 app.get(baseUrl + '/status', (req, res) => {
     var response = {};
     response.modes = Modes;
     response.mode = currentMode;
     response.pinCount = gpio.pinCount;
     response.pinStatus = gpio.getStatus();
-    response.temp = sensor.sensorOutput;
     res.send(response);
 });
 
