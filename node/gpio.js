@@ -1,12 +1,21 @@
 var rpio = require('rpio');
-rpio.init({mapping: 'physical'});
+//rpio.init({mapping: 'physical'}); // Physical mapping
+rpio.init({mapping: 'gpio'}); //BCM # mapping scheme
+
 exports.sleep = rpio.sleep;
 
 var ON = rpio.LOW;
 var OFF = rpio.HIGH;
 
-var pins = [3,5,7,11,13,15,19,21];
+/*
+* Follows BCM numbering from: https://pinout.xyz/#
+* 3 is BCM 2
+* 11 is BCM 17
+* etc
+*/
 
+//var pins = [3,5,7,11,13,15,19,21];
+var pins = [17]
 var pinState = {};
 exports.state = pinState;
 exports.pinCount = pins.length;

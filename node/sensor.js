@@ -2,7 +2,7 @@ var sensor = require('node-dht-sensor');
 
 //TODO: move GPIO config to external file
 //22 = AM2302 Sensor
-//4 = GPIO pin
+//4 = GPIO pin -- NOTE: this is physical pin #7. GPIO uses physical mapping.
 function read() {
     return new Promise((res, rej) => {
         sensor.read(22, 4, (err, temperature, humidity) => {
@@ -22,17 +22,23 @@ function read() {
     }); 
 }
 
+function status(){
+    return sensorOutput;
+}
+exports.status = status;
+
 var sensorOutput = {};
 sensorOutput.unit = "°F";
 function updateSensorOutput() {
     read().then(result => {
-        exports.sensorOutput = result;
-        console.log(exports.sensorOutput);
+        sensorOutput = result;
+        console.log(sensorOutput);
     }).catch(err => {
-        exports.sensorOutput = err;
-        console.log(exports.sensorOutput);
+        sensorOutput = err;
+        //console.log(exports.sensorOutput);
     })
 }
 updateSensorOutput();
-exports.sensorOutput = sensorOutput;
 setInterval(updateSensorOutput, 2000);
+
+
