@@ -9,9 +9,8 @@ function read() {
             var response = {};
             response.unit = "°F";
             if (!err) {
-                var fahrenheit = (temperature*9/5 + 32).toFixed(2);
-                var humidity = humidity.toFixed(2);
-                //console.log('temp: ' + fahrenheit + '°F, ' + 'humidity: ' + humidity + '%');
+                var fahrenheit = (temperature*9/5 + 32).toFixed(1);
+                var humidity = humidity.toFixed(1);
                 response.temp = fahrenheit;
                 response.humidity = humidity;
                 return res(response);

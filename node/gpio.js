@@ -15,7 +15,7 @@ var OFF = rpio.HIGH;
 */
 
 //var pins = [3,5,7,11,13,15,19,21];
-var pins = [17]
+var pins = [17,27,22,10]
 var pinState = {};
 exports.state = pinState;
 exports.pinCount = pins.length;
