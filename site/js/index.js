@@ -1,4 +1,4 @@
-var baseUrl = "http://david:3000/api/";
+var baseUrl = "http://david:3000/api/sprinkler";
 var modes;
 
 
@@ -41,6 +41,17 @@ function getState() {
             }
         }
     });
+}
+
+function toggleSidebar() {
+    var element = document.getElementById("sidebar");
+    if (element) {
+        if (element.classList.contains('hide')) {
+            element.classList.remove('hide');
+        } else {
+            element.classList.add('hide');
+        }
+    }
 }
 
 function toggle(id) {

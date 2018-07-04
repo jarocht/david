@@ -1,2 +1,5 @@
 ## sudo nano /boot/config.txt
-## Add "display_rotate=2"
+## Add the following to the bottom of the file:
+
+display_rotate=2
+dtoverlay=gpio-shutdown
