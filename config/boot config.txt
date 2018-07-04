@@ -1,0 +1,2 @@
+## sudo nano /boot/config.txt
+## Add "display_rotate=2"

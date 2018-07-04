@@ -1,0 +1,10 @@
+## sudo nano /usr/share/X11/xorg.conf.d/40-libinput.conf
+## Add Option "Transform" to file
+
+Section "InputClass"
+        Identifier "libinput touchscreen catchall"
+        MatchIsTouchscreen "on"
+        MatchDevicePath "/dev/input/event*"
+        Driver "libinput"
+        Option "TransformationMatrix" "-1 0 1 0 -1 1 0 0 1"
+EndSection
