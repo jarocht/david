@@ -4,6 +4,7 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <SimpleDHT.h>
+#include "creds.h"
 
 const char* host = "ESP8266";
 const char* update_path = "/firmware";
@@ -12,18 +13,11 @@ const char* update_password = "admin";
 //const char* ssid = "....";
 //const char* password = "....";
 
-unsigned long sensorPreviousMillis = 0;
-const long sensorInterval = 2500;
-int pinDHT22 = 5;
-SimpleDHT22 dht22;
-float temperature = -1;
-float humidity = -1;
-
-int pinCount = 6;
-int relayPins[] = {4, 0, 2, 14, 12, 13}; //include 5 ;later
-unsigned long pinPreviousMillis = 0;
-const long pinInterval = 1800000; //30min -- longest pin is allowed to be on
-
+int pinCount = 7;
+const int pins[] = {5, 4, 0, 2, 14, 12, 13};
+int pinsState[] = {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH};
+unsigned long pinsPreviousMillis[] = {0, 0, 0, 0, 0, 0, 0};
+const long pinInterval = 1800000; //30min -- longest pin is allowed to be on -- Prevents flooding if don't catch close command later.
 
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -33,19 +27,7 @@ void handleRoot() {
   server.send(200, "application/json", response);
 }
 
-void handleSensor() {
-  String response = "{\"celsius\":";
-  response += temperature;
-  response += ",\"fahrenheit\":";
-  response += (temperature * 1.8 + 32);
-  response += ",\"humidity\":";
-  response += humidity;
-  response += "}";
-  
-  server.send(200, "application/json", response);
-}
-
-void handleRelayPin() {
+void handleApiPin() {
   int pin = -1;
   if (server.arg("pin") != "") {
     pin = server.arg("pin").toInt();
@@ -55,63 +37,79 @@ void handleRelayPin() {
 
   bool state = false;
   if (server.arg("state") != "") {
-    state = server.arg("state") !=  "off";
+    state = server.arg("state") !=  "on";
   }
   Serial.print("State: ");
   Serial.println(state);
 
-  String response = "";
+    String response = "";
+    response += "{\"pin\":";
+    response += pin;
+    response += ",\"state\":";
+    response += (state ? "\"OFF\"" : "\"ON\"");
+    response += ",\"value\":";
+    response += state;
   if (setPinState(pin, state)) {
-    response += "{\"pin\":";
-    response += pin;
-    response += ",\"state\":";
-    response += state;
     response += ",\"success\":true}";
-    //response += "}";
-
   } else {
-    response += "{\"pin\":";
-    response += pin;
-    response += ",\"state\":";
-    response += state;
     response += ",\"success\":false}";
   }
 
   server.send(200, "application/json", response);
 }
 
-void updatePinState() {
-  unsigned long currentMillis = millis();
-
-
-}
-
 bool setPinState(int pin, int state) {
   if (pin > -1 && pin < pinCount) {
-    pinPreviousMillis = 0;
-    digitalWrite(relayPins[pin], state ? LOW : HIGH);
+    if (pinsState[pin] == state) {
+        //Prevents keep-alive scenario where pin timer is reset continuously.
+        return false;
+    }
+    //NOTE: 1 or HIGH disables the relay. Relays are triggered LOW or 0.
+    pinsState[pin] = state ? HIGH : LOW;
+    digitalWrite(pins[pin], state ? HIGH : LOW);
+    pinsPreviousMillis[pin] = state ? pinsPreviousMillis[pin] : millis();
     return true;
   } 
   return false;
 }
 
-void updateTemperatureReading() {
+void updatePinState() {
   unsigned long currentMillis = millis();
-  if (currentMillis - sensorPreviousMillis >= sensorInterval) {
-    sensorPreviousMillis = currentMillis;
+  for (int i = 0; i < pinCount; i++) {
+    if (pinsState[i] == LOW) {
+        if (currentMillis - pinsPreviousMillis[i] >= pinInterval) {
+            Serial.print("Detected pin on too long. Pin: ");
+            Serial.println(i);
+            pinsPreviousMillis[i] = currentMillis;
+            setPinState(i, HIGH);
+        }
+    }
+  }
+}
 
-    int err = SimpleDHTErrSuccess;
-    if ((err = dht22.read2(pinDHT22, &temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
-      Serial.print("Read DHT22 failed, err="); Serial.println(err);delay(2000);
-      return;
+void handleApiStatus() {
+    String response = "";
+    response += "{\"pinCount\":";
+    response += pinCount;
+    
+    response += ",\"states\":[";
+    for (int i = 0; i < pinCount; i++) {
+        response += (pinsState[i] ? "\"OFF\"" : "\"ON\"");
+        if (i != (pinCount - 1)) {
+            response += ",";
+        }
     }
-  
-    float fah = temperature * 1.8 + 32;
-    Serial.print("Sample OK: ");
-    Serial.print((float)temperature); Serial.print(" *C, ");
-    Serial.print((float)fah); Serial.print(" *F, ");
-    Serial.print((float)humidity); Serial.println(" RH%");
+
+    response += "],\"values\":[";
+    for (int i = 0; i < pinCount; i++) {
+        response += pinsState[i];
+        if (i != (pinCount - 1)) {
+            response += ",";
+        }
     }
+    response += "],\"success\":true}";
+
+    server.send(200, "application/json", response);
 }
 
 void setup() {
@@ -131,24 +129,26 @@ void setup() {
   httpUpdater.setup(&server, update_path, update_username, update_password);
   
   server.on("/", handleRoot);
-  server.on("/api/pin", handleRelayPin);
-  server.on("/api/sensor", handleSensor);
+  server.on("/api/pin", handleApiPin);
+  server.on("/api/status", handleApiStatus);
   
   server.begin();
 
   MDNS.addService("http", "tcp", 80);
   Serial.print("http://"); Serial.println(WiFi.localIP());
+
+  //Setup pins
   for (int i = 0; i < pinCount; i++) {
-    pinMode(relayPins[i], OUTPUT);
-    digitalWrite(relayPins[i], HIGH);
-  }
-  
-   updateTemperatureReading();
-   //ESP.deepSleep(10 * 1000000); //10s
-   //ESP.deepSleep(5000000, WAKE_RF_DEFAULT);
+    Serial.print("pin: ");
+    Serial.println(i);
+    Serial.print("pinState: ");
+    Serial.println(pinsState[i]);
+    pinMode(pins[i], OUTPUT);
+    digitalWrite(pins[i], pinsState[i]);
+  } 
 }
 
 void loop() {
-  //server.handleClient();
-  updateTemperatureReading();
+  server.handleClient();
+  updatePinState();
 }
