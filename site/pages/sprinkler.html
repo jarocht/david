@@ -1,0 +1,128 @@
+<div class="wrapper">
+    <nav id="sidebar" class="hide">
+        <div class="sidebar-header">
+            <h3>Bootstrap Sidebar</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <p>Dummy Heading</p>
+            <li class="active">
+                <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+                <ul class="collapse list-unstyled" id="homeSubmenu">
+                    <li>
+                        <a href="#">Home 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">About</a>
+            </li>
+            <li>
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
+                <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <li>
+                        <a href="#">Page 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Portfolio</a>
+            </li>
+            <li>
+                <a href="#">Contact</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="content" class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="col-xs-4">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info" onclick="toggleSidebar()">
+                        <i class="fas fa-align-left"></i>
+                        <span>Toggle</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button id="1" type="button" class="btn btn-primary" onclick="toggle('1')">1</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="2" type="button" class="btn btn-primary" onclick="toggle('2')">2</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button id="3" type="button" class="btn btn-primary" onclick="toggle('3')">3</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="4" type="button" class="btn btn-primary" onclick="toggle('4')">4</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button id="5" type="button" class="btn btn-primary" onclick="toggle('5')">5</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="6" type="button" class="btn btn-primary" onclick="toggle('6')">6</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button id="7" type="button" class="btn btn-primary" onclick="toggle('7')">7</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="8" type="button" class="btn btn-default disabled">8</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-4">
+                        <button id="AUTO" type="button" class="btn btn-primary disabled" onclick="toggleMode('AUTO')">Auto</button>
+                    </div>
+                    <div class="col-xs-4">
+                        <button id="MANUAL" type="button" class="btn btn-primary" onclick="toggleMode('MANUAL')">Manual</button>
+                    </div>
+                    <div class="col-xs-4">
+                        <button id="CYCLE" type="button" class="btn btn-primary" onclick="toggleMode('CYCLE')">Cycle</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button id="STOP" type="button" class="btn btn-danger" onclick="stop()">STOP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">Not in 'Manual' mode</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

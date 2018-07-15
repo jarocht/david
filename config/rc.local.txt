@@ -1,0 +1,4 @@
+//sudo nano /etc/rc.local & add
+
+# Disable WiFi Power Management
+iwconfig wlan0 power off
