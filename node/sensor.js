@@ -1,4 +1,5 @@
 var sensor = require('node-dht-sensor');
+var temp_adjustment = -1.5; //Manual offset to compensate for heat in enclosure.
 
 //TODO: move GPIO config to external file
 //22 = AM2302 Sensor
@@ -7,12 +8,26 @@ function read() {
     return new Promise((res, rej) => {
         sensor.read(22, 4, (err, temperature, humidity) => {
             var response = {};
-            response.unit = "°F";
             if (!err) {
-                var fahrenheit = (temperature*9/5 + 32).toFixed(1);
-                var humidity = humidity.toFixed(1);
-                response.temp = fahrenheit;
-                response.humidity = humidity;
+                //Celsius
+                response.celsius = {};
+                response.celsius.unit = "°C";
+                response.celsius.value = temperature + temp_adjustment;
+                response.celsius.raw = temperature;
+                response.celsius.offset = temp_adjustment;
+
+                //Fahrenheit
+                response.fahrenheit = {};
+                response.fahrenheit.unit = "°F";
+                response.fahrenheit.value = ((temperature + temp_adjustment)*9/5 + 32);
+                response.fahrenheit.raw = ((temperature)*9/5 + 32);
+                response.fahrenheit.offset = temp_adjustment;
+                
+                //Humidity
+                response.humidity = {};
+                response.humidity.unit = "%";
+                response.humidity.value = humidity;
+
                 return res(response);
             } else {
                 return rej (response);
@@ -27,7 +42,6 @@ function status(){
 exports.status = status;
 
 var sensorOutput = {};
-sensorOutput.unit = "°F";
 function updateSensorOutput() {
     read().then(result => {
         sensorOutput = result;
