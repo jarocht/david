@@ -1,9 +1,64 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="text-center text-info">
-            <h1>{{ message }}</h1>
-            <h2>{{ temperature }}</h2>
-            <h2>{{ humidity }}</h2>
+        <div class="col-xs-6">
+            <div class="location-banner">
+                <h1>Indoor</h1>
+            </div>
+            <div class="row">
+                <div class="col-xs-5 col-xs-offset-1 indoor-temp-banner">
+                    <h1>{{ temperatureTarget }}</h1>
+                </div>
+                <div class="col-xs-5 col-xs-offset-1 text-center">
+                    <div class="row">
+                        <span class="temp-arrow glyphicon glyphicon-chevron-up" />
+                    </div>
+                    <div class="row">
+                        <span class="temp-arrow glyphicon glyphicon-chevron-down" />
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div ng-repeat="room in indoor.rooms">
+                <div class="row text-center room-row well">
+                    <div class="col-xs-6 room-heading">
+                        {{ indoor.rooms[$index].name }}
+                    </div>
+                    <div class="col-xs-3 room-data">
+                        <div class="row">
+                            {{ indoor.rooms[$index].temperature }}
+                        </div>
+                        <div class="row">
+                            {{ indoor.rooms[$index].humidity }}
+                        </div>
+                    </div>
+                    <div class="col-xs-3 room-selector">
+                        <span class="glyphicon" ng-class="indoor.rooms[$index].selected ? 'glyphicon-record' : 'glyphicon-unchecked'" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6">
+
+            <div class="location-banner">
+                <h1>Outdoor</h1>
+            </div>
+            <div class="row">
+                <div class="col-xs-5 col-xs-offset-1 indoor-temp-banner">
+                    <h1>{{ weather.temperature }}°F</h1>
+                </div>
+                <div class="col-xs-5 col-xs-offset-1 text-center">
+                        <div class="row">
+                            <span class="temp-arrow glyphicon glyphicon-chevron-up" />
+                        </div>
+                        <div class="row">
+                            <span class="temp-arrow glyphicon glyphicon-chevron-down" />
+                        </div>
+                    </div>
+            </div>
+            <hr/>
+            <div class="row">
+
+            </div>
         </div>
     </div>
 </div>

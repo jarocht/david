@@ -1,5 +1,5 @@
 html * {
-   color: #9d9d9d !important;
+   color: #9d9d9d;
    font-family:'IBM Plex Mono';
 }
 
@@ -14,6 +14,7 @@ body {
 
 .jumbotron {
     margin-bottom: 0;
+    background-color: #363636;
 }
 
 .font-vt {
@@ -38,6 +39,21 @@ body {
     background-image: linear-gradient(to bottom,#888888 0,#3D3D3D 100%);
 }
 
+.well {
+    margin-left: 5px;
+    margin-right: 5px;
+    background-color: #888888;
+    border: 1px solid #888888;
+    background-image: linear-gradient(to bottom,#888888 0,#888888 100%);
+}
+
+hr-vertical {
+    border:         none;
+    border-left:    1px solid hsla(200, 10%, 50%,100);
+    height:         100vh;
+    width:          1px;       
+}
+
 /* HOME */
 
 .brain-banner * {
@@ -53,6 +69,63 @@ body {
 .img-sprinkler-gear {
     height: 50px; 
     width: 50px
+}
+
+.location-banner {
+    padding-left: 60px;
+    padding-right: 60px;
+    padding-top: 12px;
+    padding-bottom: 24px;
+    border-radius: 6px;
+    text-align: center;
+    background-color: #363636;
+}
+
+.location-banner h1 {
+    font-size: 63px;
+    font-weight: 500;
+    line-height: 1.1;
+    color: #fff;
+}
+
+.outdoor-location-banner {
+    padding-bottom: 26.8px;
+}
+
+.indoor-temp-banner * {
+    font-size: 100px;
+    color: #fff;
+}
+
+.outdoor-temp-banner * {
+    font-size: 75px;
+    color: #fff;
+}
+
+.temp-arrow {
+    font-size: 50px;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.room-heading {
+    font-size: 30px;
+    color: #fff;
+}
+
+.room-data * {
+    font-size: 30px;
+    color: #fff;
+}
+
+.room-selector {
+    font-size: 30px;
+    padding-top: 5px;
+}
+
+.room-row {
+    padding-bottom: 15px;
 }
 
 .modal-content {

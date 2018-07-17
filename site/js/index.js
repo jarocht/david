@@ -50,6 +50,25 @@ tiberiusApp.controller('mainController', function ($scope, $http, $interval) {
             // or server returns response with an error status.
         });
     }, 100);
+
+    getWeather = function () {
+        $http({
+            method: 'GET',
+            url: 'https://api.darksky.net/forecast//42.928009,%20-85.843410'
+        }).then(function successCallback(response) {
+            console.log("here!");
+            $scope.weather = response.data;
+            $scope.Model.weatherDataLoaded = (new Date).getTime();
+            // this callback will be called asynchronously
+            // when the response is available
+        }, function errorCallback(response) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+        });
+    }
+    $interval(getWeather(), 200000); //once every 200s
+
+    
 });
 
 tiberiusApp.controller('homeController', function ($scope) {
@@ -57,13 +76,48 @@ tiberiusApp.controller('homeController', function ($scope) {
 });
 
 tiberiusApp.controller('thermostatController', function ($scope, $http) {
-    $scope.message = "Thermostat Page";
+    $scope.temperatureTarget = "74.5°F";
+    $scope.indoor = {};
+    $scope.indoor.rooms = [];
+
     $scope.$watch('Model.dataLoaded', function (dataLoaded) {
         if (dataLoaded) {
             $scope.temperature = ($scope.$parent.status.sensor.fahrenheit.value).toFixed(1) + $scope.$parent.status.sensor.fahrenheit.unit;
-            $scope.humidity = ($scope.$parent.status.sensor.humidity.value).toFixed(1) + $scope.$parent.status.sensor.humidity.unit;
+            $scope.humidity = ($scope.$parent.status.sensor.humidity.value).toFixed(1) + " " + $scope.$parent.status.sensor.humidity.unit;
+            $scope.indoor.rooms[0] = {
+                name: "Thermostat",
+                temperature: $scope.temperature,
+                humidity: $scope.humidity,
+                selected: true
+            }
+            $scope.indoor.rooms[1] = {
+                name: "Master Bedroom",
+                temperature: "72.4°F",
+                humidity: "42.3 %",
+                selected: false
+            }
+            $scope.indoor.rooms[2] = {
+                name: "Office",
+                temperature: "73.4°F",
+                humidity: "39.8 %",
+                selected: false
+            }
         }
     });
+
+    $scope.$watch('Model.weatherDataLoaded', function (dataLoaded) {
+        if (dataLoaded) {
+            $scope.weather = {};
+            $scope.weather.temperature = ($scope.$parent.weather.currently.temperature).toFixed(1);
+            $scope.weather.humidity = ($scope.$parent.weather.currently.humidity*100).toFixed(1);
+
+            console.log($scope.weather);
+            console.log($scope.$parent.weather);
+        }
+    });
+
+
+
 });
 
 tiberiusApp.controller('sensorsController', function ($scope) {
