@@ -1,5 +1,6 @@
 #credentials
 creds.h
+secrets.js
 
 # Logs
 logs

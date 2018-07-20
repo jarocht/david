@@ -19,9 +19,8 @@ function read() {
                 //Fahrenheit
                 response.fahrenheit = {};
                 response.fahrenheit.unit = "°F";
-                response.fahrenheit.value = ((temperature + temp_adjustment)*9/5 + 32);
-                response.fahrenheit.raw = ((temperature)*9/5 + 32);
-                response.fahrenheit.offset = temp_adjustment;
+                response.fahrenheit.value = convertCeltoFah((temperature + temp_adjustment));
+                response.fahrenheit.raw = convertCeltoFah((temperature));
                 
                 //Humidity
                 response.humidity = {};
@@ -36,6 +35,10 @@ function read() {
     }); 
 }
 
+function convertCeltoFah(celsius) {
+    return ((celsius * 9 / 5) + 32);
+}
+
 function status(){
     return sensorOutput;
 }
@@ -45,10 +48,9 @@ var sensorOutput = {};
 function updateSensorOutput() {
     read().then(result => {
         sensorOutput = result;
-        console.log(sensorOutput);
+        //console.log(sensorOutput);
     }).catch(err => {
         sensorOutput = err;
-        //console.log(exports.sensorOutput);
     })
 }
 updateSensorOutput();
