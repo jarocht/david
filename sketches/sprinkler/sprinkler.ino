@@ -6,10 +6,10 @@
 #include <SimpleDHT.h>
 #include "creds.h"
 
-const char* host = "ESP8266";
-const char* update_path = "/firmware";
-const char* update_username = "admin";
-const char* update_password = "admin";
+const char *host = "sprinkler";
+const char *update_path = "/firmware";
+const char *update_username = "admin";
+const char *update_password = "admin";
 //const char* ssid = "....";
 //const char* password = "....";
 
@@ -22,133 +22,161 @@ const long pinInterval = 1800000; //30min -- longest pin is allowed to be on -- 
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
-void handleRoot() {
+void handleRoot()
+{
   String response = "{\"result\":\"Hello World\"}";
   server.send(200, "application/json", response);
 }
 
-void handleApiPin() {
+void handleApiPin()
+{
   int pin = -1;
-  if (server.arg("pin") != "") {
+  if (server.arg("pin") != "")
+  {
     pin = server.arg("pin").toInt();
   }
   Serial.print("Pin: ");
   Serial.println(pin);
 
   bool state = false;
-  if (server.arg("state") != "") {
-    state = server.arg("state") !=  "on";
+  if (server.arg("state") != "")
+  {
+    state = server.arg("state") != "on";
   }
   Serial.print("State: ");
   Serial.println(state);
 
-    String response = "";
-    response += "{\"pin\":";
-    response += pin;
-    response += ",\"state\":";
-    response += (state ? "\"OFF\"" : "\"ON\"");
-    response += ",\"value\":";
-    response += state;
-  if (setPinState(pin, state)) {
+  String response = "";
+  response += "{\"pin\":";
+  response += pin;
+  response += ",\"state\":";
+  response += (state ? "\"OFF\"" : "\"ON\"");
+  response += ",\"value\":";
+  response += state;
+  if (setPinState(pin, state))
+  {
     response += ",\"success\":true}";
-  } else {
+  }
+  else
+  {
     response += ",\"success\":false}";
   }
 
   server.send(200, "application/json", response);
 }
 
-bool setPinState(int pin, int state) {
-  if (pin > -1 && pin < pinCount) {
-    if (pinsState[pin] == state) {
-        //Prevents keep-alive scenario where pin timer is reset continuously.
-        return false;
+bool setPinState(int pin, int state)
+{
+  if (pin > -1 && pin < pinCount)
+  {
+    if (pinsState[pin] == state)
+    {
+      //Prevents keep-alive scenario where pin timer is reset continuously.
+      return false;
     }
     //NOTE: 1 or HIGH disables the relay. Relays are triggered LOW or 0.
     pinsState[pin] = state ? HIGH : LOW;
     digitalWrite(pins[pin], state ? HIGH : LOW);
     pinsPreviousMillis[pin] = state ? pinsPreviousMillis[pin] : millis();
     return true;
-  } 
+  }
   return false;
 }
 
-void updatePinState() {
+void updatePinState()
+{
   unsigned long currentMillis = millis();
-  for (int i = 0; i < pinCount; i++) {
-    if (pinsState[i] == LOW) {
-        if (currentMillis - pinsPreviousMillis[i] >= pinInterval) {
-            Serial.print("Detected pin on too long. Pin: ");
-            Serial.println(i);
-            pinsPreviousMillis[i] = currentMillis;
-            setPinState(i, HIGH);
-        }
+  for (int i = 0; i < pinCount; i++)
+  {
+    if (pinsState[i] == LOW)
+    {
+      if (currentMillis - pinsPreviousMillis[i] >= pinInterval)
+      {
+        Serial.print("Detected pin on too long. Pin: ");
+        Serial.println(i);
+        pinsPreviousMillis[i] = currentMillis;
+        setPinState(i, HIGH);
+      }
     }
   }
 }
 
-void handleApiStatus() {
-    String response = "";
-    response += "{\"pinCount\":";
-    response += pinCount;
-    
-    response += ",\"states\":[";
-    for (int i = 0; i < pinCount; i++) {
-        response += (pinsState[i] ? "\"OFF\"" : "\"ON\"");
-        if (i != (pinCount - 1)) {
-            response += ",";
-        }
-    }
+void handleApiStatus()
+{
+  String response = "";
+  response += "{\"pinCount\":";
+  response += pinCount;
 
-    response += "],\"values\":[";
-    for (int i = 0; i < pinCount; i++) {
-        response += pinsState[i];
-        if (i != (pinCount - 1)) {
-            response += ",";
-        }
+  response += ",\"states\":[";
+  for (int i = 0; i < pinCount; i++)
+  {
+    response += (pinsState[i] ? "\"OFF\"" : "\"ON\"");
+    if (i != (pinCount - 1))
+    {
+      response += ",";
     }
-    response += "],\"success\":true}";
+  }
 
-    server.send(200, "application/json", response);
+  response += "],\"values\":[";
+  for (int i = 0; i < pinCount; i++)
+  {
+    response += pinsState[i];
+    if (i != (pinCount - 1))
+    {
+      response += ",";
+    }
+  }
+  response += "],\"success\":true}";
+
+  server.send(200, "application/json", response);
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.println("Booting Sketch...");
+  WiFi.hostname(host);
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
 
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  while (WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
   }
+  Serial.print("Hostname: ");
+  Serial.println(host);
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
 
   MDNS.begin(host);
 
   httpUpdater.setup(&server, update_path, update_username, update_password);
-  
+
   server.on("/", handleRoot);
   server.on("/api/pin", handleApiPin);
   server.on("/api/status", handleApiStatus);
-  
+
   server.begin();
 
   MDNS.addService("http", "tcp", 80);
-  Serial.print("http://"); Serial.println(WiFi.localIP());
 
   //Setup pins
-  for (int i = 0; i < pinCount; i++) {
+  for (int i = 0; i < pinCount; i++)
+  {
     Serial.print("pin: ");
     Serial.println(i);
     Serial.print("pinState: ");
     Serial.println(pinsState[i]);
     pinMode(pins[i], OUTPUT);
     digitalWrite(pins[i], pinsState[i]);
-  } 
+  }
+  Serial.println("All pins configured");
 }
 
-void loop() {
+void loop()
+{
   server.handleClient();
   updatePinState();
 }
