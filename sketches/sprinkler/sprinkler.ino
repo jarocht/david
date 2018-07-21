@@ -41,7 +41,7 @@ void handleApiPin()
   bool state = false;
   if (server.arg("state") != "")
   {
-    state = server.arg("state") != "on";
+    state = server.arg("state") != "ON";
   }
   Serial.print("State: ");
   Serial.println(state);
