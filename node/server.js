@@ -2,12 +2,13 @@ var express = require('express');
 var app = express();
 module.secrets = require('./secrets.js');
 module.gpio = require('./gpio.js'), gpio = module.gpio;
+module.weather = require('./weather.js'), weather = module.weather;
+require('./weather-routes.js')(app);
 module.sprinkler = require('./sprinkler.js'), sprinkler = module.sprinkler;
 require('./sprinkler-routes.js')(app);
 module.sensor = require('./sensor.js'), sensor = module.sensor;
 require('./sensor-routes.js')(app);
-module.weather = require('./weather.js'), weather = module.weather;
-require('./weather-routes.js')(app);
+
 
 
 var port = 3000;
@@ -52,4 +53,4 @@ process.stdin.on('data', () => {
     gpio.close();
     process.exit();
 });
-weather.status();
+

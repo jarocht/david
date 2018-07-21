@@ -1,6 +1,6 @@
 var sprinkler = module.parent.sprinkler;
 
-module.exports = function(app) {
+module.exports = function (app) {
     var baseUrl = "/api/sprinkler";
 
     app.get(baseUrl + '/stop', (req, res) => {
@@ -9,24 +9,22 @@ module.exports = function(app) {
     });
 
     app.get(baseUrl + '/set/:mode', (req, res) => {
-        var success = false;
-        sprinkler.setMode(req.params.mode)
-        res.send({ success });
+        sprinkler.setMode(req.params.mode, (result) => {
+
+            res.send(result);
+        });
     });
 
-    app.get(baseUrl + '/manual/:pin', (req, res) => {
-        var result = sprinkler.togglePin(req.params.pin);
-        res.send(result);
+    app.get(baseUrl + '/manual/:zone', (req, res) => {
+        sprinkler.toggleZone(req.params.zone, (result) => {
+            res.send(result);
+        }, true);
     });
 
-    app.get(baseUrl + '/manual/:pin/off', (req, res) => {
-        var result = sprinkler.setPinOff(req.params.pin);
-        res.send(result);
-    });
-
-    app.get(baseUrl + '/manual/:pin/on', (req, res) => {
-        var result = sprinkler.setPinOn(req.params.pin);
-        res.send(result);
+    app.get(baseUrl + '/manual/:zone/:state', (req, res) => {
+        sprinkler.setZone(req.params.zone, req.params.state, (result) => {
+            res.send(result);
+        }, true);
     });
 
     app.get(baseUrl + '/status', (req, res) => {
