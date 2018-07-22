@@ -22,9 +22,7 @@ var timers = [];
 
 function stop() {
     clearTimers(); //IMPORTANT: Clear timers first, then turn off.
-    for (var i = 0; i < zones; i++) {
-        setZoneOff(i);
-    }
+    stopAllZones();
     currentMode = MANUAL
 }
 exports.stop = stop;
@@ -52,6 +50,7 @@ function setMode(mode, callback) {
     }
 
     if (mode == CYCLE) {
+        stopAllZones();
         cycleZones(() => {
             currentMode = MANUAL;
             clearTimers();
@@ -169,6 +168,12 @@ function clearTimers() {
         clearTimeout(timers[i]);
     }
     timers = [];
+}
+
+function stopAllZones() {
+    for (var i = 0; i < zones; i++) {
+        setZoneOff(i);
+    }
 }
 
 function status() {

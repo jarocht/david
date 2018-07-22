@@ -48,65 +48,33 @@
         </nav>
 
         <div id="content" class="container-fluid">
-            <div class="row">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <button id="1" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('1')">1</button>
-                        </div>
-                        <div class="col-xs-6">
-                            <button id="2" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('2')">2</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <button id="3" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('3')">3</button>
-                        </div>
-                        <div class="col-xs-6">
-                            <button id="4" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('4')">4</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <button id="5" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('5')">5</button>
-                        </div>
-                        <div class="col-xs-6">
-                            <button id="6" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('6')">6</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <button id="7" type="button" class="btn btn-primary btn-sprinker" onclick="toggle('7')">7</button>
-                        </div>
-                        <div class="col-xs-6">
-                            <button type="button" id="sidebarCollapse" class="btn btn-primary btn-sprinker {{gearBtnClass}}" ng-click="toggleSidebar()">
-                                <img src="img/sprinkler/gear.png" class="img-sprinkler-gear" />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <button id="AUTO" type="button" class="btn btn-primary btn-sprinker disabled" onclick="toggleMode('AUTO')">Auto</button>
-                        </div>
-                        <div class="col-xs-4">
-                            <button id="MANUAL" type="button" class="btn btn-primary btn-sprinker" onclick="toggleMode('MANUAL')">Manual</button>
-                        </div>
-                        <div class="col-xs-4">
-                            <button id="CYCLE" type="button" class="btn btn-primary btn-sprinker" onclick="toggleMode('CYCLE')">Cycle</button>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <button id="STOP" type="button" class="btn btn-danger btn-sprinker" onclick="stop()">STOP</button>
-                        </div>
-                    </div>
+            <div ng-repeat="zone in sprinkler.values track by $index">
+                <div class="col-xs-6" ng-if="$even">
+                    <button id="1" type="button" class="btn btn-primary btn-sprinker" ng-class="{'btn-success':  zone, 'disabled': sprinkler.mode != 'MANUAL'}" ng-click="toggleZone($index)">{{$index + 1}}</button>
                 </div>
+                <div class="col-xs-6" ng-if="$odd">
+                    <button id="2" type="button" class="btn btn-primary btn-sprinker" ng-class="{'btn-success':  zone, 'disabled': sprinkler.mode != 'MANUAL'}" ng-click="toggleZone($index)">{{$index + 1}}</button>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary btn-sprinker {{gearBtnClass}}" ng-click="toggleSidebar()">
+                    <img src="img/sprinkler/gear.png" class="img-sprinkler-gear" />
+                </button>
+            </div>
+            <div class="col-xs-4">
+                <button id="AUTO" type="button" class="btn btn-primary btn-sprinker" ng-class="{'btn-success':  sprinkler.mode == 'AUTO'}" ng-click="setMode('AUTO')">Auto</button>
+            </div>
+            <div class="col-xs-4">
+                <button id="MANUAL" type="button" class="btn btn-primary btn-sprinker" ng-class="{'btn-success':  sprinkler.mode == 'MANUAL'}" ng-click="setMode('MANUAL')">Manual</button>
+            </div>
+            <div class="col-xs-4">
+                <button id="CYCLE" type="button" class="btn btn-primary btn-sprinker" ng-class="{'btn-success':  sprinkler.mode == 'CYCLE'}" ng-click="setMode('CYCLE')">Cycle</button>
+            </div>
+            <div class="col-xs-12">
+                <button id="STOP" type="button" class="btn btn-danger btn-sprinker" ng-click="stop()">STOP</button>
             </div>
         </div>
     </div>
-
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

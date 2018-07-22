@@ -1,6 +1,3 @@
-var baseUrl = "http://tiberius.local:3000/api/sprinkler";
-var modes;
-
 var tiberiusApp = angular.module('tiberiusApp', ['ngRoute']);
 
 tiberiusApp.config(function ($routeProvider, $locationProvider) {
@@ -40,7 +37,7 @@ tiberiusApp.controller('mainController', function ($scope, $http, $interval) {
     $interval(() => {
         $http({
             method: 'GET',
-            url: 'http://tiberius.local:3000/api/status'
+            url: 'http://tiberius:3000/api/status'
         }).then(function successCallback(response) {
             $scope.status = response.data;
             $scope.Model.dataLoaded = (new Date).getTime();
@@ -50,7 +47,7 @@ tiberiusApp.controller('mainController', function ($scope, $http, $interval) {
             // called asynchronously if an error occurs
             // or server returns response with an error status.
         });
-    }, 100);
+    }, 500);
 });
 
 tiberiusApp.controller('homeController', function ($scope) {
@@ -96,19 +93,17 @@ tiberiusApp.controller('sensorsController', function ($scope) {
     $scope.message = "Sensors Page";
 });
 
-tiberiusApp.controller('sprinklerController', function ($scope) {
-    $scope.message = 'Sprinkler Page!';
-
+tiberiusApp.controller('sprinklerController', function ($scope, $http) {
     $scope.$watch('Model.dataLoaded', function (dataLoaded) {
         if (dataLoaded) {
             $scope.mode = $scope.$parent.status.sprinkler.mode;
             $scope.pinStatus = $scope.$parent.status.sprinkler.pinStatus;
-            console.log($scope.mode);
-            console.log($scope.pinStatus);
+            $scope.sprinkler = $scope.$parent.status.sprinkler;
+            console.log($scope.sprinkler);
         }
     });
 
-    $scope.sidebarState = false;
+    $scope.sidebarState = true;
     $scope.sidebarClass = 'hide';
     $scope.gearBtnClass = '';
 
@@ -117,4 +112,44 @@ tiberiusApp.controller('sprinklerController', function ($scope) {
         $scope.gearBtnClass = $scope.sidebarState ? 'active' : '';
         $scope.sidebarState = !$scope.sidebarState;
     };
+
+    $scope.setMode = function (mode) {
+        $http({
+            method: 'GET',
+            url: 'http://tiberius:3000/api/sprinkler/set/' + mode
+        }).then(function successCallback(response) {
+            // this callback will be called asynchronously
+            // when the response is available
+        }, function errorCallback(response) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+        });
+    }
+
+    $scope.stop = function () {
+        $http({
+            method: 'GET',
+            url: 'http://tiberius:3000/api/sprinkler/stop'
+        }).then(function successCallback(response) {
+            // this callback will be called asynchronously
+            // when the response is available
+        }, function errorCallback(response) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+        });
+    }
+
+    $scope.toggleZone = function (zone) {
+        $http({
+            method: 'GET',
+            url: 'http://tiberius:3000/api/sprinkler/manual/' + zone
+        }).then(function successCallback(response) {
+            // this callback will be called asynchronously
+            // when the response is available
+        }, function errorCallback(response) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+        });
+    }
+
 });
